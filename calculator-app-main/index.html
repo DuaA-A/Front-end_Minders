@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- displays site properly based on user's device -->
+
+  <link rel="icon" type="image/png" sizes="32x32" href="./images/favicon-32x32.png">
+  <link rel="stylesheet" href="style.css">
+  <title>Frontend Mentor | Calculator app</title>
+  
+  
+</head>
+<body>
+
+<div class="container">
+  <div class="title">Calc</div>
+  <div class="result">
+    <div id="display">0</div>
+  </div>
+  <div class="buttons-container">
+    <button class="n7" onclick="appendRes('7')">7</button>
+    <button class="n8" onclick="appendRes('8')">8</button>
+    <button class="n9" onclick="appendRes('9')">9</button>
+    <button class="del" onclick="deleteChar()">DEL</button>
+    
+    <button class="n4" onclick="appendRes('4')">4</button>
+    <button class="n5" onclick="appendRes('5')">5</button>
+    <button class="n6" onclick="appendRes('6')">6</button>
+    <button class="plus" onclick="appendRes('+')">+</button>
+
+    <button class="n1" onclick="appendRes('1')">1</button>
+    <button class="n2" onclick="appendRes('2')">2</button>
+    <button class="n3" onclick="appendRes('3')">3</button>
+    <button class="minus" onclick="appendRes('-')">-</button>
+    
+    <button class="Dot" onclick="appendRes('.')">.</button>
+    <button class="zero" onclick="appendRes('0')">0</button>
+    <button class="divide" onclick="appendRes('/')">/</button>
+    <button class="mul" onclick="appendRes('x')">x</button>
+
+    <button class="reset" onclick="resetResl()">Reset</button>
+    <button class="resul" onclick="calcResl()" clicked="false" >=</button>
+  </div>
+</div>
+  
+
+<script src="script.js"></script>
+</body>
+</html>
