@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="quiz.css">
+
+</head>
+<body>
+    <div class="container">
+        <button id="start-btn">Start Quiz</button>
+        <div class="quizBox" >
+            <div class="ques"></div>
+            <div class="timer"></div>
+            <input type="text" value="Type your ans..." id="ans">
+            <button id="submit-btn">Submit Answer</button>
+        </div>
+
+        <p id="result"></p>
+
+    </div>
+    <script>
+        const Q = [
+            { q: "What is the capital of France?", ans: "Paris" },
+            { q: "What is 2 + 2?", ans: "4" },
+            { q: "What color do you get when you mix red and blue?", ans: "Purple" },
+            { q: "What language runs in a browser?", ans: "JavaScript" }
+        ];
+    
+        const startBtn = document.getElementById("start-btn");
+        const quizBox = document.getElementById("quizBox");
+        const ques = document.getElementById("ques");
+        const timerEl = document.getElementById("timer");
+        const answerInput = document.getElementById("ans");
+        const submitBtn = document.getElementById("submit-btn");
+        const resultEl = document.getElementById("result");
+    
+        let time = 10;
+        let timerID;
+        let answered = false;
+        let userAnswer = "";
+        let score = 0;
+    
+        const userAns = [];
+    
+        startBtn.addEventListener("click", () => {
+            startBtn.style.display = "none";
+            quizBox.style.display = "block ";
+            runQuiz();
+        });
+    
+        async function runQuiz() {
+            for (let i = 0; i < Q.length; i++) {
+                ques.textContent = Q[i].q;
+                answerInput.textContent = "";
+                resultEl.textContent = "";
+                answered = false;
+                
+                time = 10;
+                timerEl.textContent = `Time left: ${time}s`;
+                timerID = setInterval(() => {
+                    time--;
+                    timerEl.textContent = `Time left: ${time}s`;
+                    if (time <= 0) {
+                        clearInterval(timerID);
+                        answered = true;
+                    }
+                }, 1000);
+            
+                const correctAns = Q[i].ans;
+                const isCorrect = userAnswer === correctAns;
+                if (isCorrect) score++;
+    
+                userAns.push({
+                    question: Q[i].q,
+                    userAnswer: userAnswer,
+                    correctAnswer: correctAns,
+                    isCorrect
+                });
+    
+            }
+    
+            quizBox.style.display = "none";
+            showSummary();
+        }
+    
+    
+        function showSummary() {
+            let summary = `<h2>Quiz finished!</h2><h3>Your Score: ${score} / ${Q.length}</h3>`;
+    
+            userAns.forEach(entry => {
+                summary += `
+                    <div style="margin-bottom: 20px;">
+                        <strong>Q: ${entry.question}</strong><br>
+                        Your answer: ${entry.userAnswer || "no answer"}<br>
+                        Correct answer: ${entry.correctAnswer}<br>
+                        <span style="color:${entry.isCorrect ? 'green' : 'red'};">
+                            ${entry.isCorrect ? "correct" : "incorrect"}
+                        </span>
+                    </div>
+                `;
+            });
+    
+            resultEl.innerHTML = summary;
+        }
+    </script>
+    
+</body>
+</html>

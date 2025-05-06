@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        function unreliableFunction() {
+            if (Math.random() < 0.5) 
+                throw new Error('Failed!');
+            return 'Success!';
+        }
+        async function retry(fn, maxTry=5){
+            let lasterror;
+            for(let t=1; t<=maxTry;t++){
+                try{
+                    return fn;
+                }
+                catch (error){
+                    console.warn(`attemp ${t} faild: ${error.message}`);
+                    lasterror=error;
+                }
+            }
+            throw new Error(`all ${maxTry} attempts failed. last error: ${lasterror.message}`);
+        }
+        try {
+            const result = retry(unreliableFunction, 20);
+            console.log("res:", result);
+        } catch (error) {
+            console.error("error:", error.message);
+        }
+    </script>
+</body>
+</html>
