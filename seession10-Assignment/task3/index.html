@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>User Dashboard</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f2f5;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background-color: #343a40;
+      padding: 1rem;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    nav {
+      display: flex;
+      gap: 1rem;
+    }
+
+    nav button {
+      background: transparent;
+      border: none;
+      color: #ccc;
+      font-size: 1rem;
+      cursor: pointer;
+      padding: 0.5rem 1rem;
+    }
+
+    nav button.active {
+      color: white;
+      border-bottom: 2px solid #ffc107;
+    }
+
+    .container {
+      padding: 2rem;
+    }
+
+    .section {
+      display: none;
+    }
+
+    .section.active {
+      display: block;
+    }
+
+    .card {
+      background: white;
+      border-radius: 8px;
+      padding: 1rem 1.5rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .label {
+      font-weight: bold;
+      color: #333;
+    }
+
+    .value {
+      margin-left: 0.5rem;
+      color: #555;
+    }
+
+    ul {
+      list-style: none;
+      padding-left: 1rem;
+    }
+
+    ul li::before {
+      content: '• ';
+      color: #007bff;
+    }
+
+    a {
+      color: #007bff;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h2>Dashboard</h2>
+    <nav>
+      <button class="nav-btn active" data-tab="profile">Profile</button>
+      <button class="nav-btn" data-tab="settings">Settings</button>
+      <button class="nav-btn" data-tab="orders">Orders</button>
+    </nav>
+  </header>
+
+  <div class="container">
+    <div id="profile" class="section active">
+      <div class="card" id="profile-section"></div>
+      <div class="card" id="address-section"></div>
+      <div class="card" id="company-section"></div>
+    </div>
+
+    <div id="settings" class="section">
+      <div class="card">
+        <h3>User Settings</h3>
+        <ul id="settings-list"></ul>
+      </div>
+    </div>
+
+    <div id="orders" class="section">
+      <div class="card">
+        <h3>Latest Orders & Shipments</h3>
+        <ul id="orders-list"></ul>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.querySelectorAll(".nav-btn").forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove('active'));
+        document.querySelectorAll(".section").forEach(s => s.classList.remove('active'));
+
+        btn.classList.add('active');
+        document.getElementById(btn.dataset.tab).classList.add('active');
+      });
+    });
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      try {
+        const userRes = await fetch('https://jsonplaceholder.typicode.com/users/1');
+        const user = await userRes.json();
+
+        document.getElementById('profile-section').innerHTML = `
+          <h3>Basic Info</h3>
+          <p><span class="label">Name:</span><span class="value">${user.name}</span></p>
+          <p><span class="label">Username:</span><span class="value">${user.username}</span></p>
+          <p><span class="label">Email:</span><span class="value">${user.email}</span></p>
+          <p><span class="label">Phone:</span><span class="value">${user.phone}</span></p>
+          <p><span class="label">Website:</span><span class="value"><a href="http://${user.website}" target="_blank">${user.website}</a></span></p>
+        `;
+
+        document.getElementById('address-section').innerHTML = `
+          <h3>Address</h3>
+          <p><span class="label">Street:</span><span class="value">${user.address.street}</span></p>
+          <p><span class="label">City:</span><span class="value">${user.address.city}</span></p>
+          <p><span class="label">Zipcode:</span><span class="value">${user.address.zipcode}</span></p>
+          <p><span class="label">Geo:</span><span class="value">${user.address.geo.lat}, ${user.address.geo.lng}</span></p>
+        `;
+
+        document.getElementById('company-section').innerHTML = `
+          <h3>Company</h3>
+          <p><span class="label">Name:</span><span class="value">${user.company.name}</span></p>
+          <p><span class="label">Catch Phrase:</span><span class="value">"${user.company.catchPhrase}"</span></p>
+          <p><span class="label">Business Focus:</span><span class="value">${user.company.bs}</span></p>
+        `;
+
+        const settingsRes = await fetch('https://jsonplaceholder.typicode.com/todos?userId=1');
+        const settings = await settingsRes.json();
+        const settingsList = document.getElementById('settings-list');
+        settings.forEach(s => {
+          const li = document.createElement('li');
+          li.textContent = `${s.title} - ${s.completed ? 'Y' : 'X'}`;
+          settingsList.appendChild(li);
+        });
+
+        const ordersRes = await fetch('https://jsonplaceholder.typicode.com/posts?userId=1');
+        const orders = await ordersRes.json();
+        const shipmentPromises = orders.map(order =>
+          fetch(`https://jsonplaceholder.typicode.com/comments?postId=${order.id}`).then(res => res.json())
+        );
+        const shipments = await Promise.all(shipmentPromises);
+
+        const ordersList = document.getElementById('orders-list');
+        orders.forEach((order, index) => {
+          const orderItem = document.createElement('li');
+          orderItem.innerHTML = `
+            <strong>${order.title}</strong>
+            <p>${order.body}</p>
+            <ul>
+              ${shipments[index].map(sh => `<li><em>${sh.name}</em>: ${sh.body.slice(0, 60)}...</li>`).join('')}
+            </ul>
+          `;
+          ordersList.appendChild(orderItem);
+        });
+
+      } catch (error) {
+        console.error('Error loading dashboard:', error);
+      }
+    });
+  </script>
+</body>
+</html>
