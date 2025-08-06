@@ -254,3 +254,26 @@
 //         break;
 // }
 
+function sum(a, b) { 
+    return a + b;
+}
+sum(2, 3); // arguments
+
+function greet(name = "Guest") {
+    return `Hello, ${name}`;
+}
+console.log(greet()); // Hello, Guest
+
+console.log(factorial(5)); 
+
+function factorial(n) {
+    if (n === 0 || n === 1) {
+        return 1;
+    }
+    return n * factorial(n - 1);
+}
+
+sayHi(); 
+const sayHi = function() {
+    console.log("Hello");
+};
